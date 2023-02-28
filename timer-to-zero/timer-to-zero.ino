@@ -9,15 +9,14 @@ int current_state = Setup1;
 int time_on  = 1;
 int time_off = 1;
 uint32_t tic = 0;
-uint32_t tac = 0;
+uint32_t boom = 3; //время запала
 uint32_t myTimer = 0;
 uint32_t timerStop = 0;
+int relaypin = 9;
 
 
 
 void setup() {
-  //LCD.init();    // инициализация LCD дисплея
-  //LCD.backlight(); // включение подсветки дисплея
   Serial.begin(9600); 
   disp.clear();        // чистим дисплей 
   disp.brightness(7);  // яркость, 0 - 7 (минимум - максимум)
@@ -25,6 +24,7 @@ void setup() {
   pinMode(5, INPUT_PULLUP); // стоп
   pinMode(6, INPUT_PULLUP); // верх
   pinMode(7, INPUT_PULLUP); // вниз
+  pinMode(relaypin, OUTPUT); // вниз
 }
 
 
@@ -57,28 +57,33 @@ void loop() {
   if (current_state == Setup1) { // кнопками задаем время
     if (buttonPlus)          			time_on ++;
     else if (buttonMinus) 				time_on --;
-  	else if (buttonStart) 				current_state = Timer_game, tic = 0, tac = 0;
+  	else if (buttonStart) 				current_state = Timer_game, tic = 0;
 		//else if (buttonStop)					continue;
     
     if (time_on < 1)				      time_on = 1; // нужно, чтобы не задавать время с минусом 
-    if (timeEvent || pushButton)  disp.displayInt(time_on);	//printlsd(String("Setup 1 "), String("time: ") + String(time_on)); // Вывод на экран состояния
+    if (timeEvent || pushButton)  disp.displayInt(time_on), Serial.println(time_on);	//printlsd(String("Setup 1 "), String("time: ") + String(time_on)); // Вывод на экран состояния
     
   }
 
   else if (current_state == Timer_game) {
     if (tic < time_on){
       if (timeEvent) {
-        disp.displayInt(time_on); //printlsd(String("Game"), String("time: ") + String(time_on - tic)); // Вывод на экран состояния 
+        disp.displayInt(time_on - tic), Serial.println(time_on - tic), Serial.println(tic); //printlsd(String("Game"), String("time: ") + String(time_on - tic)); // Вывод на экран состояния 
       	
         tic++;
       }
-    } else {
+    } 
+    else {
       current_state = Deploy; 
-      tic = 0, tac = 0;
-    }
-  } 
+      tic = 0;      
+      if (tic < boom){
+        digitalWrite(relaypin, HIGH);
+        tic ++;
+      } 
+      digitalWrite(relaypin, LOW);      
+    } 
+  }
 }
-
 
 
 
