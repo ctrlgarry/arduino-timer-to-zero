@@ -4,15 +4,15 @@
 #include <GyverTM1637.h>
 GyverTM1637 disp(CLK, DIO);
 
-enum state  {Setup1, Timer_game, Deploy};
+enum state  {Setup1, Timer_game, Deploy, End};
 int current_state = Setup1;
 int time_on  = 1;
 int time_off = 1;
 uint32_t tic = 0;
-uint32_t boom = 3; //время запала
+uint32_t tac = 0;
+uint32_t boom = 9; //время запала
 uint32_t myTimer = 0;
 uint32_t timerStop = 0;
-int relaypin = 9;
 
 
 
@@ -24,7 +24,8 @@ void setup() {
   pinMode(5, INPUT_PULLUP); // стоп
   pinMode(6, INPUT_PULLUP); // верх
   pinMode(7, INPUT_PULLUP); // вниз
-  pinMode(relaypin, OUTPUT); // вниз
+  pinMode(8, INPUT_PULLUP); // триггер 
+  digitalWrite(9, 0); // реле
 }
 
 
@@ -36,11 +37,12 @@ void loop() {
   bool buttonStop = false;
   bool timeEvent = false;
   bool pushButton = false;
+  //bool relaypin = false; 
   
   bool DEBUG = true;
   
   if (digitalRead(4) == 0 || digitalRead(5) == 0 ||digitalRead(6) == 0 || digitalRead(7) == 0   ) {
-    delay(200);//если любая кнопка нажата, ждем 200мс
+    delay(200);//считывает состояние каждой кнопки каждые 200мс
                //создает событие при нажатии на кнопку
     if (digitalRead(6) == 0) buttonPlus = true,  pushButton = true;
     if (digitalRead(7) == 0) buttonMinus = true, pushButton = true;
@@ -66,22 +68,36 @@ void loop() {
   }
 
   else if (current_state == Timer_game) {
-    if (tic < time_on){
+    if (tic <= time_on){
       if (timeEvent) {
         disp.displayInt(time_on - tic), Serial.println(time_on - tic), Serial.println(tic); //printlsd(String("Game"), String("time: ") + String(time_on - tic)); // Вывод на экран состояния 
       	
         tic++;
       }
-    } 
-    else {
+    } else {
       current_state = Deploy; 
-      tic = 0;      
-      if (tic < boom){
-        digitalWrite(relaypin, HIGH);
-        tic ++;
-      } 
-      digitalWrite(relaypin, LOW);      
-    } 
+      tic = 0, tac = 0;
+    }
+  }     
+     
+  	else if (current_state == Deploy) {
+    if (tac < boom){
+      if (timeEvent) {
+        disp.displayInt(8888);
+        digitalWrite(9, 0); 
+      	tac++;
+      }
+    } else {
+    	current_state = End; 
+      digitalWrite(9, 1);
+      tic = 0, tac = 0;
+    }
+  }
+  
+  	else if (current_state == End) {
+      if (timeEvent) {
+    Serial.println("end");
+    }
   }
 }
 
