@@ -4,7 +4,7 @@
   #include <GyverTM1637.h>
   GyverTM1637 disp(CLK, DIO);
 
-  enum state  {Setup1, Timer_game, Deploy, End};
+  enum state  {Setup1, ZeroTime, Kaboom, Idle};
   int current_state = Setup1;
   int time_on  = 1;
   int time_off = 1;
@@ -25,7 +25,7 @@
     pinMode(6, INPUT_PULLUP); // верх
     pinMode(7, INPUT_PULLUP); // вниз
     pinMode(8, INPUT_PULLUP); // триггер
-    digitalWrite(9, 0); // реле
+    analogWrite(255, 0); // реле
   }
 
 
@@ -49,7 +49,7 @@
       if (digitalRead(7) == 0) buttonMinus = true, pushButton = true;
       if (digitalRead(4) == 0) buttonStart = true, pushButton = true;
       if (digitalRead(5) == 0) buttonStop = true,  pushButton = true;
-      if (digitalRead(8) == 0) trigger = true;
+      if (digitalRead(8) == 0) trigger = true,     pushButton = true;//Serial.println("trigger"); // проверить старт схему и в по
 
     }// создает событие при нажатии на кнопку
 
@@ -59,53 +59,48 @@
     }
 
     if (current_state == Setup1) { // кнопками задаем время
-      if (buttonPlus)                                  time_on ++;
-      else if (buttonMinus)                                 time_on --;
-            else if (buttonStart)                                
-current_state = Timer_game, tic = 0;
-                  //else if (buttonStop)                                 
-       continue;
-
-      if (time_on < 1)                                      time_on = 1;
-// нужно, чтобы не задавать время с минусом
-      if (timeEvent || pushButton)  disp.displayInt(time_on),
-Serial.println(time_on);        //printlsd(String("Setup 1 "),
-String("time: ") + String(time_on)); // Вывод на экран состояния
-
+      if (buttonPlus)                                          time_on ++;
+      else if (buttonMinus)                                    time_on --;
+      else if (buttonStart)         current_state = Idle, tic = 0;
+      if (time_on < 1)                                      time_on = 1; // нужно, чтобы не задавать время с минусом
+      if (timeEvent || pushButton)  disp.displayInt(time_on), Serial.println(time_on);         // Вывод на экран состояния
     }
-
-    else if (current_state == Timer_game) {
-      if (tic <= time_on){
-        if (timeEvent) {
-          disp.displayInt(time_on - tic), Serial.println(time_on - tic),
-Serial.println(tic); //printlsd(String("Game"), String("time: ") +
-String(time_on - tic)); // Вывод на экран состояния
-
-          tic++;
-        }
-      } else {
-        current_state = Deploy;
-        tic = 0, tac = 0;
+    if (current_state == Idle) {
+      Serial.println("IDLE");
+      Serial.println(trigger);
+      if( trigger == true){
+        current_state == ZeroTime;
+        tic = 0;
+      }
+      
+    }
+    if (current_state == ZeroTime){
+     Serial.println("ZEROTIME");// вывести для всех стате состояние тригера
+     Serial.println(trigger);
+      if (trigger == false){
+        current_state == Idle;
+      }
+      if (time_on > tic && timeEvent){
+        
+        disp.displayInt(time_on - tic), Serial.println(time_on - tic); // добавить минус на дисплей для понимания состояния
+        tic++;
+      }
+      else{
+        current_state == Kaboom;
       }
     }
 
-            else if (current_state == Deploy) { //включение реле
-      if (tac < boom){
-        if (timeEvent) {
-          disp.displayInt(8888);
-          analogWrite(A1, 2);
-                tac++;
-        }
-      } else {
-              current_state = End;
-        analogWrite(A1, 255);
-        tic = 0, tac = 0;
+    if (current_state == Kaboom){
+      Serial.println("KABOOM");
+      Serial.println(trigger);
+      if (tac > boom && timeEvent){
+        disp.displayInt(8888), Serial.println("boom");
+        analogWrite(0, 0); // реле
+        tac++;
       }
+      else{
+        analogWrite(255,0);
+      }     
     }
 
-            else if (current_state == End) {
-        if (timeEvent) {
-      Serial.println("end");
-      }
-    }
   }
