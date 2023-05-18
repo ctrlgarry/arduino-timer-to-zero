@@ -79,9 +79,7 @@
       else if (buttonStart) current_state = Idle, tic = 0;
       
       if      (time_on < 1) time_on = 1;  // проверка на дурака, что бы нельзя было задать время с отрицательным значением
-      if      (timeEvent || pushButton) {
-        disp.displayInt(time_on);
-        if (DEBUG) {
+            if (DEBUG) {
           String dbgStr = String("Current state = ")
                         + String(current_state) 
                         + String(" | time on  = ")
@@ -89,15 +87,20 @@
                         + String(" | time_off = ") 
                         + String(tic );
           Serial.println(dbgStr);  // Вывод на экран состояния 
-        }
+        }  
+      if      (timeEvent || pushButton) {
+        disp.displayInt(time_on);
+
       }
     }
     //////////////////////// Состояние активации ////////////////////////////
     if (current_state == Kaboom){
       if (tac > boom && timeEvent){
+        if(timeEvent){
         disp.displayInt(8888);
         analogWrite(0, 0); // Инвертированное реле
         tac++;
+        }
       } else {
         disp.displayInt(0000);
         analogWrite(255,0); // Выключаем реле
@@ -116,13 +119,16 @@
 
     //////////////////////// Состояние обратного отсчета ////////////////////////////
     if (current_state == ZeroTime) {
-      if (trigger == false && timeEvent){
+      if (trigger == false){
+        Serial.println("cheburek"); 
         current_state = Idle;
       }
       
-      if (time_on > tic && timeEvent){    
-        disp.displayInt(time_on - tic), Serial.println(time_on - tic); // добавить минус на дисплей для понимания состояния
-        tic++;
+      if (time_on > tic){   
+        if (timeEvent) {
+          disp.displayInt(time_on - tic), Serial.println(time_on - tic); // добавить минус на дисплей для понимания состояния
+          tic++;
+          }
       } else {
         current_state = Kaboom;
       }
