@@ -25,9 +25,8 @@
     pinMode(6, INPUT_PULLUP); // верх
     pinMode(7, INPUT_PULLUP); // вниз
     pinMode(8, INPUT_PULLUP); // триггер
-    analogWrite(0, 0); // реле
+    analogWrite(A0, 255); // реле
   }
-
 
   void loop() {
     // Set Value
@@ -39,7 +38,7 @@
     bool pushButton  = false;
     bool trigger     = false;
 
-    bool DEBUG = true;  // Переменная для вывода специальной иформации в serialport
+    bool DEBUG = false;  // Переменная для вывода специальной иформации в serialport
 
     if (digitalRead(4) == 0 ||
         digitalRead(5) == 0 ||
@@ -74,8 +73,8 @@
     
     //////////////////////// Состояние настройки ////////////////////////////
     if (current_state == Setup1) { // кнопками задаем время
-      if      (buttonPlus)  time_on ++;
-      else if (buttonMinus) time_on --;
+      if      (buttonPlus)  time_on +5;
+      else if (buttonMinus) time_on -5;
       else if (buttonStart) current_state = Idle, tic = 0;
       
       if      (time_on < 1) time_on = 1;  // проверка на дурака, что бы нельзя было задать время с отрицательным значением
@@ -98,12 +97,12 @@
       if (boom > tac){
         if(timeEvent){
         disp.displayInt(8888);
-        analogWrite(255, 0); // Инвертированное реле
+        analogWrite(A0, 0); // Инвертированное реле
         tac++;
         }
       } else {
         disp.displayInt(0000);
-        analogWrite(0,0); // Выключаем реле
+        analogWrite(A0,255); // Выключаем реле
       }
       
       if (DEBUG) {
@@ -120,7 +119,6 @@
     //////////////////////// Состояние обратного отсчета ////////////////////////////
     if (current_state == ZeroTime) {
       if (trigger == false){
-        Serial.println("cheburek"); 
         current_state = Idle;
       }
       
@@ -147,7 +145,6 @@
     //////////////////////// Состояние ожидания ////////////////////////////
     if (current_state == Idle) {
       if( trigger && timeEvent){
-        Serial.println("lolkek");
         current_state = ZeroTime;
         tic = 0;
       }  
