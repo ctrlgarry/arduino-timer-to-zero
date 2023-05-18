@@ -92,48 +92,6 @@
         }
       }
     }
-    
-    //////////////////////// Состояние ожидания ////////////////////////////
-    if (current_state == Idle) {
-      if( trigger == true){
-        current_state == ZeroTime;
-        tic = 0;
-      }  
-      if (DEBUG) {
-          String dbgStr = String("Current state = ") 
-                        + String(current_state) 
-                        + String(" | time on  = ")
-                        + String(time_on)  
-                        + String(" | time_off = ")
-                        + String(tic );
-          Serial.println(dbgStr);  // Вывод на экран состояния 
-        }
-    }
-    
-    //////////////////////// Состояние обратного отсчета ////////////////////////////
-    if (current_state == ZeroTime) {
-      if (trigger == false){
-        current_state == Idle;
-      }
-      
-      if (time_on > tic && timeEvent){    
-        disp.displayInt(time_on - tic), Serial.println(time_on - tic); // добавить минус на дисплей для понимания состояния
-        tic++;
-      } else {
-        current_state == Kaboom;
-      }
-      
-      if (DEBUG) {
-          String dbgStr = String("Current state = " )
-                        + String(current_state) 
-                        + String(" | time on  = ")
-                        + String(time_on) 
-                        + String(" | time_off = ")
-                        + String(tic );
-          Serial.println(dbgStr);  // Вывод на экран состояния 
-        }
-    }
-  
     //////////////////////// Состояние активации ////////////////////////////
     if (current_state == Kaboom){
       if (tac > boom && timeEvent){
@@ -155,5 +113,51 @@
           Serial.println(dbgStr);  // Вывод на экран состояния 
       }
     }
+
+    //////////////////////// Состояние обратного отсчета ////////////////////////////
+    if (current_state == ZeroTime) {
+      if (trigger == false && timeEvent){
+        current_state = Idle;
+      }
+      
+      if (time_on > tic && timeEvent){    
+        disp.displayInt(time_on - tic), Serial.println(time_on - tic); // добавить минус на дисплей для понимания состояния
+        tic++;
+      } else {
+        current_state = Kaboom;
+      }
+      
+      if (DEBUG) {
+          String dbgStr = String("Current state = " )
+                        + String(current_state) 
+                        + String(" | time on  = ")
+                        + String(time_on) 
+                        + String(" | time_off = ")
+                        + String(tic );
+          Serial.println(dbgStr);  // Вывод на экран состояния 
+        }
+    }
+
+    //////////////////////// Состояние ожидания ////////////////////////////
+    if (current_state == Idle) {
+      if( trigger && timeEvent){
+        Serial.println("lolkek");
+        current_state = ZeroTime;
+        tic = 0;
+      }  
+      if (DEBUG) {
+          String dbgStr = String("Current state = ") 
+                        + String(current_state) 
+                        + String(" | time on  = ")
+                        + String(time_on)  
+                        + String(" | time_off = ")
+                        + String(tic );
+          Serial.println(dbgStr);  // Вывод на экран состояния 
+        }
+    }
+    
+    
+  
+    
 
   }
