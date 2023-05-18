@@ -25,7 +25,7 @@
     pinMode(6, INPUT_PULLUP); // верх
     pinMode(7, INPUT_PULLUP); // вниз
     pinMode(8, INPUT_PULLUP); // триггер
-    analogWrite(255, 0); // реле
+    analogWrite(0, 0); // реле
   }
 
 
@@ -95,22 +95,22 @@
     }
     //////////////////////// Состояние активации ////////////////////////////
     if (current_state == Kaboom){
-      if (tac > boom && timeEvent){
+      if (boom > tac){
         if(timeEvent){
         disp.displayInt(8888);
-        analogWrite(0, 0); // Инвертированное реле
+        analogWrite(255, 0); // Инвертированное реле
         tac++;
         }
       } else {
         disp.displayInt(0000);
-        analogWrite(255,0); // Выключаем реле
+        analogWrite(0,0); // Выключаем реле
       }
       
       if (DEBUG) {
           String dbgStr = String("Current state = ")
                         + String(current_state) 
                         + String(" | boom     = ") 
-                        + String(time_on) 
+                        + String(boom) 
                         + String(" | tac      = ") 
                         + String(tac );
           Serial.println(dbgStr);  // Вывод на экран состояния 
