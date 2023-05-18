@@ -44,7 +44,8 @@
     if (digitalRead(4) == 0 ||
         digitalRead(5) == 0 ||
         digitalRead(6) == 0 ||
-        digitalRead(7) == 0   
+        digitalRead(7) == 0 ||
+        digitalRead(8) == 0
        ) {
       delay(200);  //считывает состояние каждой кнопки каждые 200мс
                    //создает событие при нажатии на кнопку
@@ -54,16 +55,17 @@
       if (digitalRead(5) == 0) buttonStop  = true, pushButton = true;
       if (digitalRead(8) == 0) trigger     = true, pushButton = true;
       
-      if (DEBUG) {
-        String dbgStr = String("Status button | " + buttonPlus  + " | "
-                                                  + buttonMinus + " | "
-                                                  + buttonStart + " | "
-                                                  + buttonStop  + " | "
-                                                  + trigger     + " | ");
-        Serial.println(dbgStr);  // Вывод на экран состояния нажатия кнопок
-      }
+     
     }
-
+   if (DEBUG) {
+        String dbgStr = String("Status button | ")
+                      + String(buttonPlus)  
+                      + String(buttonMinus)        
+                      + String(buttonStart) 
+                      + String(buttonStop)                              
+                      + String(trigger);                                                 
+        Serial.println(dbgStr);  // Вывод на экран состояния нажатия кнопок
+      }  
     // Запуск посекундного таймера, для точного отсчета времени
     if (millis() - myTimer >= 1000) {
       myTimer = millis();
@@ -80,9 +82,12 @@
       if      (timeEvent || pushButton) {
         disp.displayInt(time_on);
         if (DEBUG) {
-          String dbgStr = String("Current state = " + current_state + 
-                                 " | time on  = " + time_on + 
-                                 " | time_off = " + tic );
+          String dbgStr = String("Current state = ")
+                        + String(current_state) 
+                        + String(" | time on  = ")
+                        + String(time_on)  
+                        + String(" | time_off = ") 
+                        + String(tic );
           Serial.println(dbgStr);  // Вывод на экран состояния 
         }
       }
@@ -95,9 +100,12 @@
         tic = 0;
       }  
       if (DEBUG) {
-          String dbgStr = String("Current state = " + current_state + 
-                                 " | time on  = " + time_on + 
-                                 " | time_off = " + tic );
+          String dbgStr = String("Current state = ") 
+                        + String(current_state) 
+                        + String(" | time on  = ")
+                        + String(time_on)  
+                        + String(" | time_off = ")
+                        + String(tic );
           Serial.println(dbgStr);  // Вывод на экран состояния 
         }
     }
@@ -116,9 +124,12 @@
       }
       
       if (DEBUG) {
-          String dbgStr = String("Current state = " + current_state + 
-                                 " | time on  = " + time_on + 
-                                 " | time_off = " + tic );
+          String dbgStr = String("Current state = " )
+                        + String(current_state) 
+                        + String(" | time on  = ")
+                        + String(time_on) 
+                        + String(" | time_off = ")
+                        + String(tic );
           Serial.println(dbgStr);  // Вывод на экран состояния 
         }
     }
@@ -135,9 +146,12 @@
       }
       
       if (DEBUG) {
-          String dbgStr = String("Current state = " + current_state + 
-                                 " | boom     = " + time_on + 
-                                 " | tac      = " + tac );
+          String dbgStr = String("Current state = ")
+                        + String(current_state) 
+                        + String(" | boom     = ") 
+                        + String(time_on) 
+                        + String(" | tac      = ") 
+                        + String(tac );
           Serial.println(dbgStr);  // Вывод на экран состояния 
       }
     }
