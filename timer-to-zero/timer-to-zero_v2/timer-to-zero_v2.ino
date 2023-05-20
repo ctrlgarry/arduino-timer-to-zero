@@ -6,7 +6,7 @@
 
   enum state  {Setup1, ZeroTime, Kaboom, Idle};
   int current_state = Setup1;
-  int time_on  = 1;
+  int time_on  = 3600;
   int time_off = 1;
   uint32_t tic = 0;
   uint32_t tac = 0;
@@ -73,8 +73,8 @@
     
     //////////////////////// Состояние настройки ////////////////////////////
     if (current_state == Setup1) { // кнопками задаем время
-      if      (buttonPlus)  time_on +5;
-      else if (buttonMinus) time_on -5;
+      if      (buttonPlus)  time_on = time_on + 10;
+      else if (buttonMinus) time_on = time_on - 10;
       else if (buttonStart) current_state = Idle, tic = 0;
       
       if      (time_on < 1) time_on = 1;  // проверка на дурака, что бы нельзя было задать время с отрицательным значением
