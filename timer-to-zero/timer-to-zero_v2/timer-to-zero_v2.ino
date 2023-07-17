@@ -144,6 +144,7 @@
 
     //////////////////////// Состояние ожидания ////////////////////////////
     if (current_state == Idle) {
+      disp.displayInt(time_on);
       if( trigger && timeEvent){
         current_state = ZeroTime;
         tic = 0;
